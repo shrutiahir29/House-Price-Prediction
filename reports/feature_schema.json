@@ -1,0 +1,67 @@
+{
+  "project_name": "HouseWise",
+  "author": "Person 1 (Data Preprocessing, EDA & Linear Regression)",
+  "target": {
+    "column_name": "Price_INR_Lakhs",
+    "unit": "INR Lakhs (1 Lakh = 100,000 INR)",
+    "description": "Final property sale price in Lakhs"
+  },
+  "features": {
+    "all_features_ordered": [
+      "BHK",
+      "Bathrooms",
+      "Super_Area_SqFt",
+      "Carpet_Area_SqFt",
+      "Floor_Number",
+      "Total_Floors",
+      "Age_of_Property",
+      "Parking",
+      "Lift_Available",
+      "Gated_Community",
+      "Distance_to_Metro_km",
+      "Distance_to_City_Center_km",
+      "City",
+      "Locality_Type",
+      "Property_Type",
+      "Furnishing_Status"
+    ],
+    "numerical_features": [
+      "BHK",
+      "Bathrooms",
+      "Super_Area_SqFt",
+      "Carpet_Area_SqFt",
+      "Floor_Number",
+      "Total_Floors",
+      "Age_of_Property",
+      "Parking",
+      "Lift_Available",
+      "Gated_Community",
+      "Distance_to_Metro_km",
+      "Distance_to_City_Center_km"
+    ],
+    "categorical_features": [
+      "City",
+      "Locality_Type",
+      "Property_Type",
+      "Furnishing_Status"
+    ],
+    "excluded_columns": [
+      "Property_ID",
+      "Price_INR_Lakhs",
+      "original_index"
+    ],
+    "total_feature_count": 16
+  },
+  "split_configuration": {
+    "train_ratio": 0.8,
+    "test_ratio": 0.2,
+    "random_state": 42,
+    "train_row_count": 64000,
+    "total_cleaned_rows": 80000
+  },
+  "preprocessing_pipeline": {
+    "numerical": "SimpleImputer(strategy='median') -> StandardScaler()",
+    "categorical": "SimpleImputer(strategy='most_frequent') -> OneHotEncoder(handle_unknown='ignore', sparse_output=False)",
+    "estimator": "LinearRegression()"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "model_name": "Linear Regression (Baseline Pipeline)",
+  "project": "HouseWise",
+  "target_variable": "Price_INR_Lakhs",
+  "target_unit": "INR Lakhs",
+  "partitions": {
+    "training_samples": 64000,
+    "testing_samples": 16000,
+    "split_ratio": "80:20 (random_state=42)"
+  },
+  "evaluation_metrics": {
+    "test_mae": 47.9403,
+    "test_rmse": 86.0255,
+    "test_r2": 0.6657,
+    "train_mae": 47.7235,
+    "train_rmse": 84.2302,
+    "train_r2": 0.671
+  },
+  "interpretation_guide": {
+    "mae_interpretation": "Mean Absolute Error: On average, the linear regression prediction deviates by this amount in Lakhs from actual house price. Lower is better.",
+    "rmse_interpretation": "Root Mean Squared Error: Penalizes larger pricing errors more heavily. Lower is better.",
+    "r2_interpretation": "R-squared coefficient of determination: Proportion of price variance explained by linear combinations of features. Higher is better (1.0 = perfect explanation)."
+  }
+}

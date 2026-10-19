@@ -1,0 +1,2 @@
+Model,Test_MAE_Lakhs,Test_RMSE_Lakhs,Test_R2,Train_MAE_Lakhs,Train_RMSE_Lakhs,Train_R2,Train_Rows,Test_Rows
+Linear Regression,47.9403,86.0255,0.6657,47.7235,84.2302,0.671,64000,16000
