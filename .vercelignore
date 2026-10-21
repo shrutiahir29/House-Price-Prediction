@@ -1,0 +1,10 @@
+# Ignore Python backend, data, and notebooks on Vercel frontend build
+backend/
+models/
+data/
+notebooks/
+src/
+reports/
+*.py
+*.joblib
+*.csv
