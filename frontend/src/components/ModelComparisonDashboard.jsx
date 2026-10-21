@@ -4,6 +4,7 @@ import {
   HelpCircle, ArrowUpRight, Cpu, Layers, Activity 
 } from "lucide-react";
 import { INITIAL_METRICS } from "../data/mockData";
+import { API_BASE_URL } from "../api/config";
 
 export default function ModelComparisonDashboard({ onStartPredicting }) {
   const [metrics, setMetrics] = useState(INITIAL_METRICS);
@@ -14,7 +15,7 @@ export default function ModelComparisonDashboard({ onStartPredicting }) {
   useEffect(() => {
     async function fetchMetrics() {
       try {
-        const res = await fetch("http://127.0.0.1:8000/model-metrics");
+        const res = await fetch(`${API_BASE_URL}/model-metrics`);
         if (!res.ok) throw new Error("HTTP error " + res.status);
         const data = await res.json();
         if (data.models && data.models.length >= 4) {

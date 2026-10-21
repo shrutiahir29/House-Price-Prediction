@@ -4,6 +4,7 @@ import {
   HelpCircle, AlertCircle, ArrowRight, BarChart3, RotateCcw, Shield 
 } from "lucide-react";
 import { PRESET_PROPERTIES } from "../data/mockData";
+import { API_BASE_URL } from "../api/config";
 
 export default function PredictionSection({ initialFormData, onOpenComparison }) {
   const [formData, setFormData] = useState({
@@ -74,7 +75,7 @@ export default function PredictionSection({ initialFormData, onOpenComparison })
     try {
       if (compareAllModels) {
         // Call /predict-all endpoint
-        const res = await fetch("http://127.0.0.1:8000/predict-all", {
+        const res = await fetch(`${API_BASE_URL}/predict-all`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -85,7 +86,7 @@ export default function PredictionSection({ initialFormData, onOpenComparison })
         setResult(data.predictions[formData.model_name] || data.predictions["xgboost"]);
       } else {
         // Call single /predict endpoint
-        const res = await fetch("http://127.0.0.1:8000/predict", {
+        const res = await fetch(`${API_BASE_URL}/predict`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
