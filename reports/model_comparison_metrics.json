@@ -1,0 +1,93 @@
+{
+  "project": "HouseWise - Indian House Price Prediction",
+  "benchmark_summary": {
+    "total_models_evaluated": 4,
+    "champion_model_id": "xgboost",
+    "champion_model_name": "XGBoost Regressor",
+    "champion_r2": 0.7896,
+    "champion_mae": 32.4866,
+    "champion_rmse": 68.2581,
+    "mae_reduction_vs_baseline_pct": 32.24
+  },
+  "models": [
+    {
+      "model_id": "xgboost",
+      "model_name": "XGBoost Regressor (Tuned Pipeline)",
+      "display_name": "XGBoost Regressor",
+      "test_mae": 32.4866,
+      "test_rmse": 68.2581,
+      "test_r2": 0.7896,
+      "train_mae": 30.8554,
+      "train_rmse": 60.609,
+      "train_r2": 0.8297,
+      "hyperparameters": {
+        "subsample": 0.85,
+        "reg_lambda": 5.0,
+        "reg_alpha": 1.0,
+        "n_estimators": 500,
+        "max_depth": 5,
+        "learning_rate": 0.03,
+        "colsample_bytree": 1.0
+      },
+      "mae_improvement_pct": 32.24,
+      "rmse_improvement_pct": 20.65,
+      "r2_gain": 0.1239
+    },
+    {
+      "model_id": "random_forest",
+      "model_name": "Random Forest Regressor (Tuned Pipeline)",
+      "display_name": "Random Forest Regressor",
+      "test_mae": 32.9443,
+      "test_rmse": 68.9376,
+      "test_r2": 0.7853,
+      "train_mae": 24.409,
+      "train_rmse": 53.9469,
+      "train_r2": 0.865,
+      "hyperparameters": {
+        "n_estimators": 100,
+        "min_samples_split": 15,
+        "min_samples_leaf": 6,
+        "max_features": 0.7,
+        "max_depth": 25
+      },
+      "mae_improvement_pct": 31.28,
+      "rmse_improvement_pct": 19.86,
+      "r2_gain": 0.1196
+    },
+    {
+      "model_id": "decision_tree",
+      "model_name": "Decision Tree Regressor (Tuned Pipeline)",
+      "display_name": "Decision Tree Regressor",
+      "test_mae": 34.9493,
+      "test_rmse": 72.1917,
+      "test_r2": 0.7646,
+      "train_mae": 32.9839,
+      "train_rmse": 66.5738,
+      "train_r2": 0.7945,
+      "hyperparameters": {
+        "min_samples_split": 30,
+        "min_samples_leaf": 50,
+        "max_features": 0.9,
+        "max_depth": 15
+      },
+      "mae_improvement_pct": 27.1,
+      "rmse_improvement_pct": 16.08,
+      "r2_gain": 0.0989
+    },
+    {
+      "model_id": "linear_regression",
+      "model_name": "Linear Regression (Baseline Pipeline)",
+      "display_name": "Linear Regression",
+      "test_mae": 47.9403,
+      "test_rmse": 86.0255,
+      "test_r2": 0.6657,
+      "train_mae": 47.7235,
+      "train_rmse": 84.2302,
+      "train_r2": 0.671,
+      "hyperparameters": {},
+      "mae_improvement_pct": 0.0,
+      "rmse_improvement_pct": 0.0,
+      "r2_gain": 0.0
+    }
+  ]
+}

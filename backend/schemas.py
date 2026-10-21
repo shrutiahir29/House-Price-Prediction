@@ -31,7 +31,7 @@ PropertyType = Literal[
 
 FurnishingType = Literal["Semi-Furnished", "Unfurnished", "Furnished"]
 
-ModelChoice = Literal["random_forest", "linear_regression", "xgboost", "catboost"]
+ModelChoice = Literal["random_forest", "linear_regression", "xgboost", "decision_tree"]
 
 
 class HouseInput(BaseModel):

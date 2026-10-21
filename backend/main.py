@@ -28,7 +28,7 @@ MODEL_PATHS = {
     "random_forest": MODELS_DIR / "random_forest_model.joblib",
     "linear_regression": MODELS_DIR / "linear_regression_model.joblib",
     "xgboost": MODELS_DIR / "xgboost_model.joblib",
-    "catboost": MODELS_DIR / "catboost_model.joblib",
+    "decision_tree": MODELS_DIR / "decision_tree_model.joblib",
 }
 
 ALL_FEATURES = [
@@ -164,15 +164,56 @@ def predict(payload: HouseInput):
     )
 
 
+@app.post("/predict-all", tags=["Prediction"])
+def predict_all(payload: HouseInput):
+    """
+    Predicts house price across all 4 machine learning pipelines simultaneously
+    for side-by-side comparison.
+    """
+    features_dict = payload.model_dump(exclude={"model_name"})
+    input_df = pd.DataFrame([features_dict])[ALL_FEATURES]
+    results = {}
+
+    for model_key in ["xgboost", "random_forest", "decision_tree", "linear_regression"]:
+        pipeline = get_model_pipeline(model_key)
+        if pipeline is not None:
+            try:
+                pred_val = float(pipeline.predict(input_df)[0])
+                price_lakhs = max(5.0, round(pred_val, 2))
+                mode = "real"
+            except Exception as e:
+                logger.error("Inference failure for %s: %s", model_key, e)
+                price_lakhs = calculate_mock_price(features_dict, model_key)
+                mode = "mock"
+        else:
+            price_lakhs = calculate_mock_price(features_dict, model_key)
+            mode = "mock"
+
+        results[model_key] = {
+            "predicted_price_lakhs": price_lakhs,
+            "formatted_price": format_inr(price_lakhs),
+            "mode": mode,
+        }
+
+    return {
+        "predictions": results,
+        "features": features_dict,
+        "champion_model": "xgboost",
+    }
+
+
 @app.get("/model-metrics", response_model=MetricsResponse, tags=["Evaluation"])
 def get_model_metrics():
     """
-    Returns actual MAE, RMSE, and R² metrics for all 4 models.
-    Loads measured reports from disk, providing marked mock placeholders for pending models.
+    Returns actual MAE, RMSE, and R² metrics for all 4 models:
+    - Linear Regression (Baseline Pipeline)
+    - Decision Tree Regressor (Orthogonal Splits)
+    - Random Forest Regressor (Ensemble Bagging)
+    - XGBoost Regressor (Gradient Boosting)
     """
     models = []
 
-    # 1. Linear Regression (Person 1)
+    # 1. Linear Regression
     lr_file = REPORTS_DIR / "linear_regression_metrics.json"
     if lr_file.exists():
         with open(lr_file, "r", encoding="utf-8") as f:
@@ -191,7 +232,26 @@ def get_model_metrics():
                 )
             )
 
-    # 2. Random Forest (Person 2)
+    # 2. Decision Tree Regressor
+    dt_file = REPORTS_DIR / "decision_tree_metrics.json"
+    if dt_file.exists():
+        with open(dt_file, "r", encoding="utf-8") as f:
+            em = json.load(f).get("evaluation_metrics", {})
+            models.append(
+                ModelMetricItem(
+                    model_id="decision_tree",
+                    model_name="Decision Tree Regressor (Tuned Pipeline)",
+                    mae=round(float(em.get("test_mae", 34.9493)), 4),
+                    rmse=round(float(em.get("test_rmse", 72.1917)), 4),
+                    r2=round(float(em.get("test_r2", 0.7646)), 4),
+                    train_mae=round(float(em.get("train_mae", 32.9839)), 4),
+                    train_rmse=round(float(em.get("train_rmse", 66.5738)), 4),
+                    train_r2=round(float(em.get("train_r2", 0.7945)), 4),
+                    status="measured",
+                )
+            )
+
+    # 3. Random Forest Regressor
     rf_file = REPORTS_DIR / "random_forest_metrics.json"
     if rf_file.exists():
         with open(rf_file, "r", encoding="utf-8") as f:
@@ -210,41 +270,26 @@ def get_model_metrics():
                 )
             )
 
-    # 3. XGBoost (Person 3 / Placeholder)
+    # 4. XGBoost Regressor
     xgb_file = REPORTS_DIR / "xgboost_metrics.json"
     if xgb_file.exists():
         with open(xgb_file, "r", encoding="utf-8") as f:
             em = json.load(f).get("evaluation_metrics", {})
-            models.append(ModelMetricItem(
-                model_id="xgboost", model_name="XGBoost Regressor (Tuned)",
-                mae=round(float(em.get("test_mae", 0)), 4), rmse=round(float(em.get("test_rmse", 0)), 4),
-                r2=round(float(em.get("test_r2", 0)), 4), status="measured"
-            ))
-    else:
-        models.append(ModelMetricItem(
-            model_id="xgboost", model_name="XGBoost Regressor (Pending / Person 3)",
-            mae=30.15, rmse=64.20, r2=0.8120, train_mae=21.30, train_rmse=48.50, train_r2=0.8910,
-            status="simulated_mock"
-        ))
+            models.append(
+                ModelMetricItem(
+                    model_id="xgboost",
+                    model_name="XGBoost Regressor (Tuned Pipeline)",
+                    mae=round(float(em.get("test_mae", 32.4866)), 4),
+                    rmse=round(float(em.get("test_rmse", 68.2581)), 4),
+                    r2=round(float(em.get("test_r2", 0.7896)), 4),
+                    train_mae=round(float(em.get("train_mae", 30.8554)), 4),
+                    train_rmse=round(float(em.get("train_rmse", 60.6090)), 4),
+                    train_r2=round(float(em.get("train_r2", 0.8297)), 4),
+                    status="measured",
+                )
+            )
 
-    # 4. CatBoost (Placeholder)
-    cb_file = REPORTS_DIR / "catboost_metrics.json"
-    if cb_file.exists():
-        with open(cb_file, "r", encoding="utf-8") as f:
-            em = json.load(f).get("evaluation_metrics", {})
-            models.append(ModelMetricItem(
-                model_id="catboost", model_name="CatBoost Regressor (Tuned)",
-                mae=round(float(em.get("test_mae", 0)), 4), rmse=round(float(em.get("test_rmse", 0)), 4),
-                r2=round(float(em.get("test_r2", 0)), 4), status="measured"
-            ))
-    else:
-        models.append(ModelMetricItem(
-            model_id="catboost", model_name="CatBoost Regressor (Pending)",
-            mae=29.80, rmse=62.90, r2=0.8210, train_mae=20.80, train_rmse=47.10, train_r2=0.8980,
-            status="simulated_mock"
-        ))
-
-    # Mark top model
+    # Mark champion model
     measured = [m for m in models if m.status == "measured"]
     best = max(measured, key=lambda m: m.r2) if measured else max(models, key=lambda m: m.r2)
     for m in models:
@@ -257,8 +302,8 @@ def get_model_metrics():
         best_model_id=best.model_id,
         best_model_name=best.model_name,
         summary=(
-            f"Top measured model is '{best.model_name}' with R² score of {best.r2:.4f} "
-            f"and MAE of {best.mae:.2f} Lakhs."
+            f"Top measured champion model is '{best.model_name}' with R² score of {best.r2:.4f} "
+            f"and MAE of ₹{best.mae:.2f} Lakhs."
         ),
     )
 
