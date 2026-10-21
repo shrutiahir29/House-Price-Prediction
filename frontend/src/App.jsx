@@ -7,6 +7,7 @@ import ModelComparisonDashboard from "./components/ModelComparisonDashboard";
 import AboutSection from "./components/AboutSection";
 import Footer from "./components/Footer";
 import { INITIAL_METRICS } from "./data/mockData";
+import { API_BASE_URL } from "./api/config";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("home"); // "home" | "predict" | "comparison" | "about"
@@ -17,7 +18,7 @@ export default function App() {
   useEffect(() => {
     async function fetchMetrics() {
       try {
-        const res = await fetch("http://127.0.0.1:8000/model-metrics");
+        const res = await fetch(`${API_BASE_URL}/model-metrics`);
         if (!res.ok) return;
         const data = await res.json();
         if (data.models && data.models.length >= 4) {
